@@ -1,5 +1,10 @@
 import cv2
 import mediapipe as mp
+import requests
+import warnings
+
+# Suppress specific deprecation warnings
+warnings.filterwarnings("ignore", category=UserWarning, module="google.protobuf")
 
 # Initialize MediaPipe Hands
 mp_hands = mp.solutions.hands
@@ -93,6 +98,28 @@ def classify_hand_gesture(landmarks):
         return "Move Backward "
     else:
         return "Unknown"
+    
+def message(action):
+    if action=="Move Forward":
+        return "F"
+    elif action=="Turn Left":
+        return "L"
+    elif action=="Stop":
+        return "S"
+    elif action=="Turn Right":
+        return "R"
+    elif action=="Move Backward ":
+        return "B"
+    else:
+        return "U"
+    
+def send_message(msg):
+    url = "http://10.10.2.63/send"
+    headers = {'Content-Type': 'text/plain'}
+    
+    response = requests.post(url, data=msg, headers=headers)
+    print(f"Sent message: {msg}")
+    print(f"Response from ESP32: {response.text}")
 
 while cap.isOpened():
     success, image = cap.read()
@@ -119,12 +146,23 @@ while cap.isOpened():
     # Display the action on the image
     cv2.putText(image, f"Action: {action}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
 
+    # Print the classified action
+    print(f"Detected action: {action}")
+    
+    msg = message(action)
+    
+    # Print the message to be sent
+    print(f"Message to send: {msg}")
+    
+    # Send the message if it's not unknown
+    send_message(msg)
+
     # Display the image
     cv2.imshow('Hand Gesture Recognition', image)
 
     # Break loop on 'q' key press
     if cv2.waitKey(5) & 0xFF == ord('q'):
         break
-
+    
 cap.release()
 cv2.destroyAllWindows()
