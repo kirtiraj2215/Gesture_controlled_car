@@ -44,19 +44,19 @@ void handleMotorControl() {
   String message = server.arg("plain");
   Serial.println("Message received: " + message);
 
-  if (message == "forward") {
+  if (message == "F") {
     moveForward();
     server.send(200, "text/plain", "Moving Forward");
-  } else if (message == "backward") {
+  } else if (message == "B") {
     moveBackward();
     server.send(200, "text/plain", "Moving Backward");
-  } else if (message == "left") {
+  } else if (message == "L") {
     turnLeft();
     server.send(200, "text/plain", "Turning Left");
-  } else if (message == "right") {
+  } else if (message == "R") {
     turnRight();
     server.send(200, "text/plain", "Turning Right");
-  } else if (message == "stop") {
+  } else if (message == "S") {
     stopMotors();
     server.send(200, "text/plain", "Stopping Motors");
   } else {
@@ -80,7 +80,7 @@ void moveBackward() {
 
 void turnLeft() {
   digitalWrite(IN1, LOW);
-  digitalWrite(IN2, LOW);
+  digitalWrite(IN2, HIGH);
   digitalWrite(IN3, HIGH);
   digitalWrite(IN4, LOW);
 }
@@ -89,7 +89,7 @@ void turnRight() {
   digitalWrite(IN1, HIGH);
   digitalWrite(IN2, LOW);
   digitalWrite(IN3, LOW);
-  digitalWrite(IN4, LOW);
+  digitalWrite(IN4, HIGH);
 }
 
 void stopMotors() {
